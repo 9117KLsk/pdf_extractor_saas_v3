@@ -16,7 +16,20 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title=settings.PROJECT_NAME)
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
-templates = Jinja2Templates(directory="app/templates")
+
+import os
+from fastapi.templating import Jinja2Templates
+
+# Obtén el directorio donde se encuentra main.py
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Construye la ruta a la carpeta 'templates'
+templates_dir = os.path.join(BASE_DIR, "templates")
+
+# Verifica que la carpeta exista (opcional pero útil para depurar)
+if not os.path.exists(templates_dir):
+    raise Exception(f"La carpeta de templates no existe en: {templates_dir}")
+
+templates = Jinja2Templates(directory=templates_dir)
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
